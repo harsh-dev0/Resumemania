@@ -3,13 +3,13 @@ import Latex from "react-latex"
 import "katex/dist/katex.min.css"
 
 interface LatexPreviewProps {
-  content: string
+  latex: string
 }
 
-const LatexPreview = ({ content }: LatexPreviewProps) => {
+const LatexPreview = ({ latex }: LatexPreviewProps) => {
   return (
     <div className="bg-white p-6 rounded-md border shadow-sm whitespace-pre-wrap font-mono text-sm overflow-auto">
-      <Latex>{content}</Latex>
+      <Latex>{latex}</Latex>
     </div>
   )
 }

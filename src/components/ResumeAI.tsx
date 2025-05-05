@@ -26,11 +26,9 @@ const Index = () => {
                   size="lg"
                   className="bg-blue-600 hover:bg-blue-700"
                 >
-                  <Link href="/profile">Get Started</Link>
+                  <Link href="/resumes">Get Started</Link>
                 </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link href="/resumes">View Demo</Link>
-                </Button>
+                
               </div>
             </div>
             <div className="md:w-1/2">
@@ -147,7 +145,7 @@ const Index = () => {
           </div>
         </section> */}
       </main>
-      <Footer />
+      
     </div>
   )
 }

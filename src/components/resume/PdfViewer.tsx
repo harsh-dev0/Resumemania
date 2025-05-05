@@ -1,9 +1,6 @@
-import { useState } from "react"
-import { Document, Page, pdfjs } from "react-pdf"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import "react-pdf/dist/esm/Page/TextLayer.css"
-import "react-pdf/dist/esm/Page/AnnotationLayer.css"
+import LatexPreview from "./LatexPreview"
 
 interface PdfViewerProps {
   pdfUrl: string | null
@@ -16,83 +13,71 @@ const PdfViewer = ({
   downloadUrl,
   fileName = "resume.pdf",
 }: PdfViewerProps) => {
-  const [numPages, setNumPages] = useState<number | null>(null)
-  const [pageNumber, setPageNumber] = useState<number>(1)
+  const [latexContent, setLatexContent] = useState<string>("")
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages)
-    setIsLoading(false)
-  }
+  useEffect(() => {
+    if (!pdfUrl) {
+      setIsLoading(false)
+      return
+    }
 
-  const goToPrevPage = () => {
-    setPageNumber((prevPageNumber) => Math.max(prevPageNumber - 1, 1))
-  }
+    const fetchLatexContent = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        // Fetch the LaTeX content from the API
+        const response = await fetch(pdfUrl)
+        if (!response.ok) {
+          throw new Error(`Failed to fetch LaTeX content: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        if (data.latexContent) {
+          setLatexContent(data.latexContent)
+        } else {
+          throw new Error("No LaTeX content found in response")
+        }
+      } catch (err) {
+        console.error("Error fetching LaTeX content:", err)
+        setError(err instanceof Error ? err.message : "Failed to load LaTeX content")
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-  const goToNextPage = () => {
-    setPageNumber((prevPageNumber) =>
-      Math.min(prevPageNumber + 1, numPages || 1)
-    )
-  }
+    fetchLatexContent()
+  }, [pdfUrl])
 
   if (!pdfUrl) {
     return (
-      <div className="text-center py-8">No PDF available to display</div>
+      <div className="text-center py-8">No resume content available to display</div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center">
+        <div className="animate-pulse text-gray-500">Loading resume content...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="w-full h-[600px] flex items-center justify-center text-red-500">
+        {error}
+      </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="border rounded-md p-2 bg-white shadow-sm">
-        {isLoading && (
-          <div className="w-[612px] h-[792px] flex items-center justify-center">
-            <Skeleton className="w-full h-full" />
-          </div>
-        )}
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={
-            <div className="w-[612px] h-[792px] flex items-center justify-center">
-              Loading PDF...
-            </div>
-          }
-          error={
-            <div className="w-[612px] h-[792px] flex items-center justify-center text-red-500">
-              Failed to load PDF
-            </div>
-          }
-        >
-          <Page
-            pageNumber={pageNumber}
-            width={612}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-          />
-        </Document>
+    <div className="flex flex-col items-center w-full">
+      <div className="border rounded-md p-4 bg-white shadow-sm w-full overflow-auto max-h-[600px]">
+        <LatexPreview latex={latexContent} />
       </div>
-
-      {numPages && numPages > 1 && (
-        <div className="flex items-center mt-2 space-x-2">
-          <Button
-            variant="outline"
-            onClick={goToPrevPage}
-            disabled={pageNumber <= 1}
-          >
-            Previous
-          </Button>
-          <div className="text-sm">
-            Page {pageNumber} of {numPages}
-          </div>
-          <Button
-            variant="outline"
-            onClick={goToNextPage}
-            disabled={pageNumber >= numPages}
-          >
-            Next
-          </Button>
-        </div>
-      )}
 
       {downloadUrl && (
         <Button className="mt-4" asChild>

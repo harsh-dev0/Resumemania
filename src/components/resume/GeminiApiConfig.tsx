@@ -13,31 +13,24 @@ import {
 import { GeminiConfig } from "@/utils/geminiAPI"
 
 interface GeminiApiConfigProps {
-  onConfigSaved: (config: GeminiConfig) => void
-  initialConfig?: GeminiConfig
+  apiKey: string
+  onApiKeyChange: (apiKey: string) => void
 }
 
 const GeminiApiConfig = ({
-  onConfigSaved,
-  initialConfig,
+  apiKey,
+  onApiKeyChange,
 }: GeminiApiConfigProps) => {
-  const [apiKey, setApiKey] = useState<string>(initialConfig?.apiKey || "")
+  const [tempApiKey, setTempApiKey] = useState<string>(apiKey || "")
   const [open, setOpen] = useState<boolean>(false)
 
   const handleSave = () => {
-    if (apiKey) {
-      const newConfig: GeminiConfig = {
-        apiKey,
-        temperature: initialConfig?.temperature || 0.4,
-        topK: initialConfig?.topK || 32,
-        topP: initialConfig?.topP || 1,
-        maxOutputTokens: initialConfig?.maxOutputTokens || 4096,
-      }
-
+    if (tempApiKey) {
       // Save to localStorage for persistence
-      localStorage.setItem("geminiApiConfig", JSON.stringify(newConfig))
+      localStorage.setItem("geminiApiKey", tempApiKey)
 
-      onConfigSaved(newConfig)
+      // Update the parent component's state
+      onApiKeyChange(tempApiKey)
       setOpen(false)
     }
   }
@@ -46,7 +39,7 @@ const GeminiApiConfig = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          Configure Gemini API
+          {apiKey ? "Change API Key" : "Configure Gemini API"}
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -62,8 +55,8 @@ const GeminiApiConfig = ({
             <Label htmlFor="apiKey">API Key</Label>
             <Input
               id="apiKey"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              value={tempApiKey}
+              onChange={(e) => setTempApiKey(e.target.value)}
               placeholder="Enter your Gemini API key"
               type="password"
             />
@@ -81,7 +74,7 @@ const GeminiApiConfig = ({
           </div>
         </div>
         <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={!apiKey}>
+          <Button onClick={handleSave} disabled={!tempApiKey}>
             Save Configuration
           </Button>
         </div>
