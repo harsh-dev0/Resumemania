@@ -1,7 +1,5 @@
-import ResumeAI from "@/components/ResumeAI";
+import Index from "@/components/ResumeAI"
 
 export default function Home() {
-  return (
-    <ResumeAI />
-  );
+  return <Index />
 }

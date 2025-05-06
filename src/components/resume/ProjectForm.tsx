@@ -2,11 +2,12 @@ import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Plus, Trash } from "lucide-react"
 
 export interface Project {
   name: string
-  description: string
-  technologies: string
+  description?: string
+  technologies?: string
   link?: string
 }
 
@@ -16,125 +17,133 @@ interface ProjectFormProps {
   onRemoveProject: (index: number) => void
 }
 
-const ProjectForm = ({
+const ProjectForm: React.FC<ProjectFormProps> = ({
   projects,
   onAddProject,
   onRemoveProject,
-}: ProjectFormProps) => {
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [technologies, setTechnologies] = useState("")
-  const [link, setLink] = useState("")
+}) => {
+  const [projectName, setProjectName] = useState("")
+  const [projectDescription, setProjectDescription] = useState("")
+  const [projectTechnologies, setProjectTechnologies] = useState("")
+  const [projectLink, setProjectLink] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (name && description && technologies) {
+  const handleAddProject = () => {
+    if (projectName.trim()) {
       onAddProject({
-        name,
-        description,
-        technologies,
-        link: link || undefined,
+        name: projectName,
+        description: projectDescription,
+        technologies: projectTechnologies,
+        link: projectLink,
       })
+
       // Reset form
-      setName("")
-      setDescription("")
-      setTechnologies("")
-      setLink("")
+      setProjectName("")
+      setProjectDescription("")
+      setProjectTechnologies("")
+      setProjectLink("")
     }
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium mb-4">Add Project</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Project Name
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Project Name"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
-            </label>
-            <Textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the project"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Technologies Used
-            </label>
-            <Input
-              value={technologies}
-              onChange={(e) => setTechnologies(e.target.value)}
-              placeholder="e.g. React, Node.js, MongoDB"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Project Link (Optional)
-            </label>
-            <Input
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
-              placeholder="https://..."
-              type="url"
-            />
-          </div>
-          
-          <Button type="submit" className="w-full">
-            Add Project
-          </Button>
-        </form>
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="project-name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Project Name *
+          </label>
+          <Input
+            id="project-name"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="Enter project name"
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="project-description"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Description
+          </label>
+          <Textarea
+            id="project-description"
+            value={projectDescription}
+            onChange={(e) => setProjectDescription(e.target.value)}
+            placeholder="Describe your project"
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="project-technologies"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Technologies Used
+          </label>
+          <Input
+            id="project-technologies"
+            value={projectTechnologies}
+            onChange={(e) => setProjectTechnologies(e.target.value)}
+            placeholder="e.g. React, Node.js, MongoDB"
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor="project-link"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Project Link
+          </label>
+          <Input
+            id="project-link"
+            value={projectLink}
+            onChange={(e) => setProjectLink(e.target.value)}
+            placeholder="https://..."
+            className="w-full"
+          />
+        </div>
+
+        <Button
+          onClick={handleAddProject}
+          disabled={!projectName.trim()}
+          className="w-full"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Add Project
+        </Button>
       </div>
 
       {projects.length > 0 && (
-        <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Your Projects</h3>
-          <div className="space-y-4">
+        <div className="space-y-4">
+          <h4 className="font-medium">Added Projects</h4>
+          <div className="space-y-2">
             {projects.map((project, index) => (
-              <div key={index} className="bg-gray-50 p-4 rounded-md relative">
-                <button
-                  onClick={() => onRemoveProject(index)}
-                  className="absolute top-2 right-2 text-gray-500 hover:text-red-500"
-                  type="button"
-                  aria-label="Remove project"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-                <div className="font-medium">{project.name}</div>
-                <div className="text-sm mt-1">{project.description}</div>
-                <div className="text-sm text-gray-600 mt-2">
-                  <span className="font-medium">Technologies:</span> {project.technologies}
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 rounded-md border"
+              >
+                <div>
+                  <p className="font-medium">{project.name}</p>
+                  {project.technologies && (
+                    <p className="text-sm text-gray-600">
+                      {project.technologies}
+                    </p>
+                  )}
                 </div>
-                {project.link && (
-                  <div className="text-sm mt-2">
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      View Project
-                    </a>
-                  </div>
-                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onRemoveProject(index)}
+                >
+                  <Trash className="h-4 w-4 text-red-500" />
+                </Button>
               </div>
             ))}
           </div>

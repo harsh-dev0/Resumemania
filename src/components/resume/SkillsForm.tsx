@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Plus, Trash } from "lucide-react"
 
 export interface Skill {
   name: string
@@ -13,23 +14,23 @@ interface SkillsFormProps {
   onRemoveSkill: (index: number) => void
 }
 
-const SkillsForm = ({
+const SkillsForm: React.FC<SkillsFormProps> = ({
   skills,
   onAddSkill,
   onRemoveSkill,
-}: SkillsFormProps) => {
-  const [name, setName] = useState("")
-  const [category, setCategory] = useState("")
+}) => {
+  const [skillName, setSkillName] = useState("")
+  const [skillCategory, setSkillCategory] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (name) {
+  const handleAddSkill = () => {
+    if (skillName.trim()) {
       onAddSkill({
-        name,
-        category: category || undefined,
+        name: skillName,
+        category: skillCategory || "Technical",
       })
-      // Reset form
-      setName("")
+
+      // Reset skill name but keep category
+      setSkillName("")
     }
   }
 
@@ -45,75 +46,71 @@ const SkillsForm = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-medium mb-4">Add Skills</h3>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Skill
-            </label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. JavaScript, Project Management, etc."
-              required
-            />
-          </div>
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="skill-name"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Skill Name *
+          </label>
+          <Input
+            id="skill-name"
+            value={skillName}
+            onChange={(e) => setSkillName(e.target.value)}
+            placeholder="Enter skill name"
+            className="w-full"
+          />
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category (Optional)
-            </label>
-            <Input
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              placeholder="e.g. Programming Languages, Soft Skills, etc."
-            />
-          </div>
+        <div>
+          <label
+            htmlFor="skill-category"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Category
+          </label>
+          <Input
+            id="skill-category"
+            value={skillCategory}
+            onChange={(e) => setSkillCategory(e.target.value)}
+            placeholder="e.g. Programming, Languages, Tools"
+            className="w-full"
+          />
+        </div>
 
-          <Button type="submit" className="w-full">
-            Add Skill
-          </Button>
-        </form>
+        <Button
+          onClick={handleAddSkill}
+          disabled={!skillName.trim()}
+          className="w-full"
+        >
+          <Plus className="mr-2 h-4 w-4" /> Add Skill
+        </Button>
       </div>
 
-      {skills.length > 0 && (
-        <div className="bg-white rounded-lg p-5 shadow-sm border border-gray-200">
-          <h3 className="text-lg font-medium mb-4">Your Skills</h3>
-
+      {Object.keys(groupedSkills).length > 0 && (
+        <div className="space-y-4">
+          <h4 className="font-medium">Added Skills</h4>
           {Object.entries(groupedSkills).map(
             ([category, categorySkills]) => (
-              <div key={category} className="mb-4">
-                <h4 className="font-medium text-gray-700 mb-2">
+              <div key={category} className="space-y-2">
+                <h5 className="text-sm font-medium text-gray-600">
                   {category}
-                </h4>
+                </h5>
                 <div className="flex flex-wrap gap-2">
-                  {categorySkills.map((skill) => {
+                  {categorySkills.map((skill, index) => {
                     const skillIndex = skills.findIndex((s) => s === skill)
                     return (
                       <div
                         key={skillIndex}
-                        className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center"
+                        className="flex items-center bg-gray-50 rounded-md border px-3 py-1"
                       >
-                        <span>{skill.name}</span>
+                        <span className="mr-2">{skill.name}</span>
                         <button
                           onClick={() => onRemoveSkill(skillIndex)}
-                          className="ml-2 text-gray-500 hover:text-red-500"
-                          type="button"
-                          aria-label="Remove skill"
+                          className="text-red-500 hover:text-red-700"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
+                          <Trash className="h-3 w-3" />
                         </button>
                       </div>
                     )

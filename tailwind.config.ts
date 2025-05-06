@@ -62,18 +62,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        brand: {
-          50: "#f0f4ff",
-          100: "#dde5fe",
-          200: "#c3d2fd",
-          300: "#9db6fb",
-          400: "#798ef7",
-          500: "#5a68f0",
-          600: "#3e45e5",
-          700: "#3335cc",
-          800: "#2d2ea5",
-          900: "#2b2e83",
-          950: "#1c1c4d",
+        navy: {
+          DEFAULT: "#1a365d",
+          light: "#2a4a7f",
+        },
+        latex: {
+          DEFAULT: "#008080",
+          light: "#e6f7f7",
         },
       },
       borderRadius: {
@@ -98,19 +93,10 @@ export default {
             height: "0",
           },
         },
-        "fade-in": {
-          from: {
-            opacity: "0",
-          },
-          to: {
-            opacity: "1",
-          },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
       },
     },
   },
