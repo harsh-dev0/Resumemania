@@ -28,7 +28,6 @@ const Index = () => {
                 >
                   <Link href="/resumes">Get Started</Link>
                 </Button>
-                
               </div>
             </div>
             <div className="md:w-1/2">
@@ -55,11 +54,12 @@ const Index = () => {
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-brand-800">
-                  Create Your Profile
+                  Upload Your Resume
                 </h3>
                 <p className="text-gray-600">
-                  Add your personal information, work experience,
-                  education, skills, and projects just once.
+                  You can upload your current resume or just paste the
+                  text. You can add additional projects and information as
+                  well.
                 </p>
               </div>
               <div className="bg-gray-50 rounded-lg p-6 text-center shadow-sm hover:shadow-md transition">
@@ -144,8 +144,8 @@ const Index = () => {
             </div>
           </div>
         </section> */}
+        <Footer />
       </main>
-      
     </div>
   )
 }

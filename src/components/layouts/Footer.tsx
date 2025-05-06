@@ -27,18 +27,10 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="/profile"
-                  className="text-gray-600 hover:text-brand-600 transition"
-                >
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <Link
                   href="/resumes"
                   className="text-gray-600 hover:text-brand-600 transition"
                 >
-                  My Resumes
+                  Generate Resumes
                 </Link>
               </li>
             </ul>
@@ -46,7 +38,7 @@ const Footer = () => {
           <div>
             <h4 className="font-medium mb-4">Contact</h4>
             <p className="text-gray-600 text-sm">
-              support@careercraft.com
+              contactcareercraft1@gmail.com
             </p>
           </div>
         </div>

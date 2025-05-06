@@ -18,7 +18,6 @@ import ProjectForm, { Project } from "@/components/resume/ProjectForm"
 import SkillsForm, { Skill } from "@/components/resume/SkillsForm"
 
 export default function ResumesPage() {
-  // State for form data
   const [activeTab, setActiveTab] = useState("upload")
   const [additionalTab, setAdditionalTab] = useState("projects")
   const [resumeText, setResumeText] = useState("")
@@ -30,15 +29,15 @@ export default function ResumesPage() {
   const [isParsingPdf, setIsParsingPdf] = useState(false)
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
   const { toast } = useToast()
 
-  // Handle file upload and parse PDF directly
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Check if file is PDF
     if (file.type !== "application/pdf") {
       toast({
         title: "Invalid file type",
@@ -50,19 +49,16 @@ export default function ResumesPage() {
 
     try {
       setIsParsingPdf(true)
-      
-      // Use FileReader to read the file as text
+
       const reader = new FileReader()
-      
+
       reader.onload = async (event) => {
         try {
-          // Get the file content as text
-          const text = event.target?.result as string || ""
-          
-          // Set the resume text
+          const text = (event.target?.result as string) || ""
+
           setResumeText(text)
           setActiveTab("job")
-          
+
           toast({
             title: "Resume uploaded",
             description: "Your resume has been successfully parsed",
@@ -71,39 +67,38 @@ export default function ResumesPage() {
           console.error("Error processing PDF content:", error)
           toast({
             title: "Error",
-            description: "Failed to process the PDF content. Please try again or paste your resume text manually.",
+            description:
+              "Failed to process the PDF content. Please try again or paste your resume text manually.",
             variant: "destructive",
           })
         } finally {
           setIsParsingPdf(false)
         }
       }
-      
+
       reader.onerror = () => {
         console.error("Error reading file")
         toast({
           title: "Error",
-          description: "Failed to read the PDF file. Please try again or paste your resume text manually.",
+          description:
+            "Failed to read the PDF file. Please try again or paste your resume text manually.",
           variant: "destructive",
         })
         setIsParsingPdf(false)
       }
-      
-      // Read the file as text
       reader.readAsText(file)
-      
     } catch (error) {
       console.error("Error handling file upload:", error)
       toast({
         title: "Error",
-        description: "Failed to process the PDF file. Please try again or paste your resume text manually.",
+        description:
+          "Failed to process the PDF file. Please try again or paste your resume text manually.",
         variant: "destructive",
       })
       setIsParsingPdf(false)
     }
   }
 
-  // Handle project management
   const handleAddProject = (project: Project) => {
     setProjects([...projects, project])
   }
@@ -112,7 +107,6 @@ export default function ResumesPage() {
     setProjects(projects.filter((_, i) => i !== index))
   }
 
-  // Handle skills management
   const handleAddSkill = (skill: Skill) => {
     setSkills([...skills, skill])
   }
@@ -121,7 +115,6 @@ export default function ResumesPage() {
     setSkills(skills.filter((_, i) => i !== index))
   }
 
-  // Handle next step in the form
   const handleNext = () => {
     if (activeTab === "upload") {
       if (!resumeText.trim()) {
@@ -140,7 +133,6 @@ export default function ResumesPage() {
     }
   }
 
-  // Handle previous step in the form
   const handlePrevious = () => {
     if (activeTab === "job") {
       setActiveTab("upload")
@@ -151,27 +143,25 @@ export default function ResumesPage() {
     }
   }
 
-  // Prepare data for API
   const prepareResumeData = () => {
-    // Format projects and skills into text format
     let formattedProjects = ""
     if (projects.length > 0) {
       formattedProjects = "PROJECTS:\n\n"
       projects.forEach((project, index) => {
         formattedProjects += `${project.name}\n`
-        if (project.description) formattedProjects += `${project.description}\n`
-        if (project.technologies) formattedProjects += `Technologies: ${project.technologies}\n`
+        if (project.description)
+          formattedProjects += `${project.description}\n`
+        if (project.technologies)
+          formattedProjects += `Technologies: ${project.technologies}\n`
         if (project.link) formattedProjects += `Link: ${project.link}\n`
         if (index < projects.length - 1) formattedProjects += "\n"
       })
     }
 
-    // Format skills
     let formattedSkills = ""
     if (skills.length > 0) {
       formattedSkills = "SKILLS:\n\n"
-      
-      // Group skills by category
+
       const groupedSkills = skills.reduce((acc, skill) => {
         const category = skill.category || "General"
         if (!acc[category]) {
@@ -180,24 +170,25 @@ export default function ResumesPage() {
         acc[category].push(skill.name)
         return acc
       }, {} as Record<string, string[]>)
-      
-      // Format grouped skills
-      Object.entries(groupedSkills).forEach(([category, categorySkills]) => {
-        formattedSkills += `${category}: ${categorySkills.join(", ")}\n`
-      })
+
+      Object.entries(groupedSkills).forEach(
+        ([category, categorySkills]) => {
+          formattedSkills += `${category}: ${categorySkills.join(", ")}\n`
+        }
+      )
     }
 
-    // Combine all additional information
     const combinedAdditionalInfo = [
       formattedProjects,
       formattedSkills,
-      additionalInfo
-    ].filter(Boolean).join("\n\n")
+      additionalInfo,
+    ]
+      .filter(Boolean)
+      .join("\n\n")
 
     return combinedAdditionalInfo
   }
 
-  // Handle PDF generation
   const handleGeneratePdf = async () => {
     if (!resumeText.trim()) {
       toast({
@@ -212,7 +203,6 @@ export default function ResumesPage() {
       setIsGenerating(true)
       setPdfUrl(null)
 
-      // Prepare additional info including projects and skills
       const combinedAdditionalInfo = prepareResumeData()
 
       const response = await fetch("/api/generate-pdf-from-text", {
@@ -235,7 +225,7 @@ export default function ResumesPage() {
       const data = await response.json()
       setPdfUrl(data.pdfUrl)
       setActiveTab("preview")
-      
+
       toast({
         title: "Success",
         description: "Your resume has been generated!",
@@ -244,7 +234,10 @@ export default function ResumesPage() {
       console.error("Error generating PDF:", error)
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate PDF",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to generate PDF",
         variant: "destructive",
       })
     } finally {
@@ -262,11 +255,16 @@ export default function ResumesPage() {
               AI Resume Generator
             </h1>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Upload your resume and provide job details to generate a professionally formatted resume tailored to your target role
+              Upload your resume and provide job details to generate a
+              professionally formatted resume tailored to your target role
             </p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid grid-cols-4 mb-8">
               <TabsTrigger value="upload">Resume</TabsTrigger>
               <TabsTrigger value="job">Job Details</TabsTrigger>
@@ -274,43 +272,81 @@ export default function ResumesPage() {
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
 
-            {/* Upload Resume Tab */}
             <TabsContent value="upload" className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold mb-4">Upload Your Resume</h2>
-                
+                <h2 className="text-xl font-semibold mb-4">
+                  Upload Your Resume
+                </h2>
+
                 <div className="mb-6">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors" 
-                       onClick={() => fileInputRef.current?.click()}>
-                    <input 
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
                       ref={fileInputRef}
-                      type="file" 
-                      accept=".pdf" 
-                      className="hidden" 
+                      type="file"
+                      accept=".pdf"
+                      className="hidden"
                       onChange={handleFileUpload}
                     />
                     {isParsingPdf ? (
                       <div className="flex flex-col items-center">
-                        <svg className="animate-spin h-10 w-10 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          className="animate-spin h-10 w-10 text-blue-500 mb-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
-                        <p className="text-lg font-medium">Parsing PDF...</p>
+                        <p className="text-lg font-medium">
+                          Parsing PDF...
+                        </p>
                       </div>
                     ) : (
                       <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-12 w-12 mx-auto mb-4 text-gray-400"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
                         </svg>
-                        <p className="text-lg font-medium">Click to upload your resume (PDF)</p>
-                        <p className="text-sm text-gray-500 mt-1">or drag and drop</p>
+                        <p className="text-lg font-medium">
+                          Click to upload your resume (PDF)
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          or drag and drop
+                        </p>
                       </>
                     )}
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <h3 className="text-lg font-medium mb-2">Or paste your resume text</h3>
+                  <h3 className="text-lg font-medium mb-2">
+                    Or paste your resume text
+                  </h3>
                   <Textarea
                     value={resumeText}
                     onChange={(e) => setResumeText(e.target.value)}
@@ -321,7 +357,7 @@ export default function ResumesPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button 
+                <Button
                   onClick={handleNext}
                   className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-2"
                 >
@@ -334,9 +370,11 @@ export default function ResumesPage() {
             <TabsContent value="job" className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <h2 className="text-xl font-semibold mb-4">Job Details</h2>
-                
+
                 <div className="mb-4">
-                  <h3 className="text-lg font-medium mb-2">Job Description</h3>
+                  <h3 className="text-lg font-medium mb-2">
+                    Job Description
+                  </h3>
                   <Textarea
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
@@ -347,14 +385,14 @@ export default function ResumesPage() {
               </div>
 
               <div className="flex justify-between">
-                <Button 
+                <Button
                   onClick={handlePrevious}
                   variant="outline"
                   className="px-6 py-2"
                 >
                   Previous
                 </Button>
-                <Button 
+                <Button
                   onClick={handleNext}
                   className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-2"
                 >
@@ -366,8 +404,10 @@ export default function ResumesPage() {
             {/* Additional Info Tab */}
             <TabsContent value="additional" className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold mb-4">Additional Information</h2>
-                
+                <h2 className="text-xl font-semibold mb-4">
+                  Additional Information
+                </h2>
+
                 {/* Sub-tabs for Projects, Skills, and Other */}
                 <div className="mb-6">
                   <div className="border-b border-gray-200">
@@ -405,7 +445,7 @@ export default function ResumesPage() {
                     </nav>
                   </div>
                 </div>
-                
+
                 {/* Projects Tab */}
                 {additionalTab === "projects" && (
                   <ProjectForm
@@ -414,7 +454,7 @@ export default function ResumesPage() {
                     onRemoveProject={handleRemoveProject}
                   />
                 )}
-                
+
                 {/* Skills Tab */}
                 {additionalTab === "skills" && (
                   <SkillsForm
@@ -423,11 +463,13 @@ export default function ResumesPage() {
                     onRemoveSkill={handleRemoveSkill}
                   />
                 )}
-                
+
                 {/* Other Tab */}
                 {additionalTab === "other" && (
                   <div className="mb-4">
-                    <h3 className="text-lg font-medium mb-2">Additional Requirements</h3>
+                    <h3 className="text-lg font-medium mb-2">
+                      Additional Requirements
+                    </h3>
                     <Textarea
                       value={additionalInfo}
                       onChange={(e) => setAdditionalInfo(e.target.value)}
@@ -439,23 +481,39 @@ export default function ResumesPage() {
               </div>
 
               <div className="flex justify-between">
-                <Button 
+                <Button
                   onClick={handlePrevious}
                   variant="outline"
                   className="px-6 py-2"
                 >
                   Previous
                 </Button>
-                <Button 
+                <Button
                   onClick={handleGeneratePdf}
                   disabled={isGenerating}
                   className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-2"
                 >
                   {isGenerating ? (
                     <span className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
                       </svg>
                       Generating...
                     </span>
@@ -469,28 +527,45 @@ export default function ResumesPage() {
             {/* Preview Tab */}
             <TabsContent value="preview" className="space-y-6">
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-semibold mb-4">Resume Preview</h2>
-                
+                <h2 className="text-xl font-semibold mb-4">
+                  Resume Preview
+                </h2>
+
                 <div className="bg-gray-50 rounded-lg min-h-[500px] flex items-center justify-center">
                   {pdfUrl ? (
-                    <PdfViewer 
-                      pdfUrl={pdfUrl} 
-                      downloadUrl={`/api/download-pdf?latex=${encodeURIComponent(pdfUrl.split('latex=')[1] || '')}`}
+                    <PdfViewer
+                      pdfUrl={pdfUrl}
+                      downloadUrl={`/api/download-pdf?latex=${encodeURIComponent(
+                        pdfUrl.split("latex=")[1] || ""
+                      )}`}
                     />
                   ) : (
                     <div className="text-center text-gray-500 p-6">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-12 w-12 mx-auto mb-4 text-gray-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
                       </svg>
                       <p>Your generated resume will appear here</p>
-                      <p className="text-sm mt-2">Click "Generate Resume" to start</p>
+                      <p className="text-sm mt-2">
+                        Click "Generate Resume" to start
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
 
               <div className="flex justify-between">
-                <Button 
+                <Button
                   onClick={handlePrevious}
                   variant="outline"
                   className="px-6 py-2"
@@ -498,11 +573,16 @@ export default function ResumesPage() {
                   Previous
                 </Button>
                 {pdfUrl && (
-                  <Button 
+                  <Button
                     className="bg-blue-600 hover:bg-blue-700 transition-colors px-6 py-2"
                     asChild
                   >
-                    <a href={`/api/download-pdf?latex=${encodeURIComponent(pdfUrl.split('latex=')[1] || '')}`} download="resume.pdf">
+                    <a
+                      href={`/api/download-pdf?latex=${encodeURIComponent(
+                        pdfUrl.split("latex=")[1] || ""
+                      )}`}
+                      download="resume.pdf"
+                    >
                       Download PDF
                     </a>
                   </Button>

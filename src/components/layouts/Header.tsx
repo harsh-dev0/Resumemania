@@ -10,7 +10,8 @@ const Header = () => {
   const handleHelp = () => {
     toast({
       title: "Need help?",
-      description: "We're here to help! Contact support@careercraft.com",
+      description:
+        "We're here to help! Contact contactcareercraft1@gmail.com",
     })
   }
 
@@ -27,16 +28,10 @@ const Header = () => {
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           <Link
-            href="/profile"
-            className="text-gray-700 hover:text-brand-600 transition"
-          >
-            Profile
-          </Link>
-          <Link
             href="/resumes"
             className="text-gray-700 hover:text-brand-600 transition"
           >
-            My Resumes
+            Generate Resume
           </Link>
           <Button variant="outline" size="sm" onClick={handleHelp}>
             Help
