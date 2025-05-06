@@ -27,7 +27,8 @@ const GeminiApiConfig = ({
 }: GeminiApiConfigProps) => {
   const [tempApiKey, setTempApiKey] = useState<string>(apiKey || "")
   const [open, setOpen] = useState<boolean>(false)
-  const [showRateLimitInfo, setShowRateLimitInfo] = useState<boolean>(rateLimited)
+  const [showRateLimitInfo, setShowRateLimitInfo] =
+    useState<boolean>(rateLimited)
 
   // Show rate limit info dialog when the rateLimited prop changes
   useEffect(() => {
@@ -84,14 +85,19 @@ const GeminiApiConfig = ({
                   Google AI Studio
                 </a>
               </p>
+              <p>Here&apos;s how to get your API key:</p>
             </div>
-            
+
             <Alert className="mt-2 bg-amber-50 border-amber-200">
               <ExclamationTriangleIcon className="h-4 w-4 text-amber-500" />
-              <AlertTitle className="text-amber-700">Free Tier Limitations</AlertTitle>
+              <AlertTitle className="text-amber-700">
+                Free Tier Limitations
+              </AlertTitle>
               <AlertDescription className="text-amber-600 text-sm">
-                The free tier of Gemini API has rate limits (typically 60 requests/minute and ~1000 requests/day).
-                If you encounter rate limiting, please wait a few minutes before trying again.
+                The free tier of Gemini API has rate limits (typically 60
+                requests/minute and ~1000 requests/day). If you encounter
+                rate limiting, please wait a few minutes before trying
+                again.
               </AlertDescription>
             </Alert>
           </div>
@@ -102,7 +108,7 @@ const GeminiApiConfig = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       {/* Rate Limit Information Dialog */}
       <Dialog open={showRateLimitInfo} onOpenChange={setShowRateLimitInfo}>
         <DialogContent>
@@ -117,7 +123,9 @@ const GeminiApiConfig = ({
           <div className="space-y-4 py-4">
             <Alert className="bg-amber-50 border-amber-200">
               <ExclamationTriangleIcon className="h-4 w-4 text-amber-500" />
-              <AlertTitle className="text-amber-700">Free Tier Limitations</AlertTitle>
+              <AlertTitle className="text-amber-700">
+                Free Tier Limitations
+              </AlertTitle>
               <AlertDescription className="text-amber-600 text-sm">
                 The free tier of Gemini API has the following limits:
                 <ul className="list-disc pl-5 mt-2">
@@ -126,7 +134,7 @@ const GeminiApiConfig = ({
                 </ul>
               </AlertDescription>
             </Alert>
-            
+
             <div className="space-y-2">
               <h4 className="font-medium">Solutions:</h4>
               <ol className="list-decimal pl-5">

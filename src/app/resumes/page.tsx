@@ -4,7 +4,6 @@ import React, { useState, useRef } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import {
   Tabs,
   TabsContent,
@@ -557,7 +556,7 @@ export default function ResumesPage() {
                       </svg>
                       <p>Your generated resume will appear here</p>
                       <p className="text-sm mt-2">
-                        Click "Generate Resume" to start
+                        Click &quot;Generate Resume&quot; to continue
                       </p>
                     </div>
                   )}

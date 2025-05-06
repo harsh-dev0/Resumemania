@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Header from "./layouts/Header"
 import Footer from "./layouts/Footer"
+import Image from "next/image"
 
 const Index = () => {
   return (
@@ -31,9 +32,11 @@ const Index = () => {
               </div>
             </div>
             <div className="md:w-1/2">
-              <img
-                src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?q=80&w=2070&auhref=format&fit=crop"
+              <Image
+                src="/path-to-image"
                 alt="Resume illustration"
+                width={500}
+                height={300}
                 className="w-full h-auto object-cover rounded-lg shadow-lg"
               />
             </div>
